@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Robotic surgical instrument, mechanical anatomy</title>
+<meta name="description" content="A 34-second, 1,020-frame cutaway of a generic tendon-driven robotic surgical instrument. Proximal drive, schematic tendon routes, wrist and jaw, proximal sensing, an optional insulated energy path, and the arm. Explanatory model, not clinical instruction.">
+<meta name="author" content="Kinetic Gain LLC">
+<meta name="robots" content="index,follow">
+<style>
+  :root {
+    --bg: #0B1019;
+    --steel: #344257;
+    --text: #E6EDF5;
+    --muted: #93A0B5;
+    --path: #00E5FF;
+    --act: #FFD166;
+    --sense: #9D4EDD;
+    --footer: 168px;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    overflow: hidden;
+  }
+  canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+  .scrim-top, .scrim-bot {
+    position: fixed; left: 0; right: 0; pointer-events: none; z-index: 2;
+  }
+  .scrim-top { top: 0; height: 132px; background: linear-gradient(#0B1019 20%, rgba(11,16,25,0)); }
+  .scrim-bot { bottom: 0; height: 210px; background: linear-gradient(rgba(11,16,25,0), #0B1019 42%); }
+  header, footer, .labels, .leaders, .schematic, .angles, .about, .rm {
+    position: fixed; z-index: 4;
+  }
+  header { top: 14px; left: 18px; right: 18px; display: flex; justify-content: space-between; gap: 16px; pointer-events: none; }
+  .kicker {
+    margin: 0 0 4px; font-size: 11px; letter-spacing: 0.16em; color: var(--muted);
+  }
+  h1 { margin: 0; font-size: 22px; font-weight: 560; letter-spacing: -0.02em; }
+  .stage-name { margin: 3px 0 0; color: var(--path); font-size: 13px; }
+  .review { margin: 6px 0 0; max-width: 62ch; color: var(--muted); font-size: 12px; line-height: 1.35; }
+  .counter {
+    text-align: right; font-family: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 12px; color: var(--muted); line-height: 1.45; pointer-events: auto;
+  }
+  .counter strong { color: var(--text); font-weight: 560; }
+  button.notes-btn, button.ctrl, .ticks button {
+    background: transparent; color: var(--text); border: 1px solid rgba(230,237,245,0.28);
+    border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer;
+  }
+  button.notes-btn { margin-top: 6px; }
+  button.ctrl:focus-visible, button.notes-btn:focus-visible, .ticks button:focus-visible, input:focus-visible, summary:focus-visible {
+    outline: 2px solid var(--path); outline-offset: 2px;
+  }
+  .labels { inset: 0; pointer-events: none; }
+  .tag {
+    position: absolute; display: flex; flex-direction: column; gap: 1px;
+    max-width: 220px; transform: translate(0, -50%);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.85);
+  }
+  .tag b { font-weight: 600; font-size: 13px; letter-spacing: 0.01em; }
+  .tag span { color: var(--muted); font-size: 11px; }
+  .tag.path b { color: var(--path); }
+  .tag.act b { color: var(--act); }
+  .tag.sense b { color: #E7D6FF; }
+  .leaders { inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .schematic, .angles {
+    width: 230px;
+    background: rgba(11,16,25,0.78);
+    border: 1px solid rgba(230,237,245,0.16);
+    border-radius: 10px; padding: 10px 12px 12px;
+  }
+  .schematic { right: 18px; bottom: 198px; }
+  .angles { left: 18px; top: 128px; width: 210px; }
+  .schematic h2, .angles h2 {
+    margin: 0 0 6px; font-size: 11px; letter-spacing: 0.12em; font-weight: 600; color: var(--muted);
+  }
+  .schematic p, .angles p { margin: 6px 0 0; color: var(--muted); font-size: 11px; line-height: 1.35; }
+  .angles .row { display: flex; justify-content: space-between; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; margin: 2px 0; }
+  .angles .row em { font-style: normal; color: #E7D6FF; }
+  footer {
+    left: 18px; right: 18px; bottom: 12px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; min-height: 22px; }
+  .chip {
+    font-size: 11px; letter-spacing: 0.04em; color: var(--text);
+    border: 1px solid rgba(230,237,245,0.35); border-radius: 999px; padding: 3px 8px;
+    background: rgba(11,16,25,0.55);
+  }
+  .caption { margin: 0; max-width: 78ch; font-size: 15px; line-height: 1.4; min-height: 2.8em; }
+  .controls { display: flex; align-items: center; gap: 10px; }
+  .scrub-wrap { position: relative; flex: 1; }
+  input[type="range"] {
+    width: 100%; appearance: none; height: 4px; border-radius: 99px;
+    background: #243044; outline: none; margin: 10px 0;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--text); cursor: pointer;
+  }
+  .ticks { position: absolute; left: 0; right: 0; top: 0; height: 24px; pointer-events: none; }
+  .ticks button {
+    position: absolute; top: 4px; width: 10px; height: 10px; padding: 0; border-radius: 50%;
+    transform: translateX(-50%); pointer-events: auto; background: var(--bg);
+  }
+  .ticks button[aria-current="true"] { background: var(--path); border-color: var(--path); }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; color: var(--muted); font-size: 12px; }
+  .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
+  .swatch.path { background: var(--path); }
+  .swatch.act { background: var(--act); }
+  .swatch.sense { background: var(--sense); }
+  .rm {
+    left: 18px; top: 128px; margin: 0; color: var(--act); font-size: 12px; max-width: 46ch;
+  }
+  .about {
+    top: 58px; right: 18px; width: min(440px, calc(100vw - 36px));
+    max-height: min(70vh, 640px); overflow: auto;
+    background: rgba(11,16,25,0.94);
+    border: 1px solid rgba(230,237,245,0.18);
+    border-radius: 12px; padding: 12px 14px 16px;
+  }
+  .about[hidden] { display: none; }
+  .about h2 { margin: 12px 0 4px; font-size: 13px; }
+  .about p, .about li { color: var(--muted); font-size: 13px; line-height: 1.4; }
+  .about ul, .about ol { margin: 6px 0; padding-left: 18px; }
+  #boot { position: fixed; left: 8px; bottom: 4px; z-index: 6; color: #ffb4b4; font: 12px ui-monospace, monospace; pointer-events: none; }
+  ::selection { background: var(--path); color: #0B1019; }
+  @media (max-width: 800px) {
+    h1 { font-size: 16px; }
+    .review, .schematic, .angles { display: none; }
+    .caption { font-size: 13px; min-height: 3.6em; }
+    header { top: 8px; left: 10px; right: 10px; }
+    footer { left: 10px; right: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { scroll-behavior: auto; }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Robotic surgical instrument, mechanical anatomy",
+  "description": "Frame-driven explanatory cutaway of a generic tendon-driven robotic surgical instrument. Not clinical instruction.",
+  "isAccessibleForFree": true,
+  "inLanguage": "en",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Kinetic Gain LLC",
+    "url": "https://kineticgain.com"
+  },
+  "about": "Generic robotic surgical instrument mechanism"
+}
+</script>
+</head>
+<body>
+<canvas id="view"></canvas>
+<div class="scrim-top"></div>
+<div class="scrim-bot"></div>
+<header>
+  <div>
+    <p class="kicker">MEDICAL TECHNOLOGY</p>
+    <h1>Robotic surgical instrument</h1>
+    <p class="stage-name" id="stage-name">Housing and shaft</p>
+    <p class="review">Generic explanatory model. Not a specific device, not a certified engineering or medical reference, and not clinical instruction.</p>
+  </div>
+  <div class="counter">
+    <div><strong id="frame-read">f 0000</strong> / 1019</div>
+    <div id="time-read">0:00.00 / 0:34.00</div>
+    <div>30 fps · 1,020 frames</div>
+    <button class="notes-btn" id="notes-btn" type="button" aria-expanded="false" aria-controls="about">Model notes</button>
+  </div>
+</header>
+<p class="rm" id="rm" hidden>Reduced motion is on. The clock does not play. Choose a stage.</p>
+<div class="labels" id="labels"></div>
+<svg class="leaders" id="leaders" aria-hidden="true"></svg>
+<aside class="schematic" id="schematic" hidden>
+  <h2>ANTAGONISTIC PAIR · SCHEMATIC</h2>
+  <svg id="pair" viewBox="0 0 200 120" width="206" height="124" aria-hidden="true"></svg>
+  <p>Wrap direction is illustrative. This is not a measured termination, cable size, or tension.</p>
+</aside>
+<aside class="angles" id="angles" hidden>
+  <h2>MODEL ANGLES</h2>
+  <div class="row"><span>Pitch</span><em id="ang-p">0°</em></div>
+  <div class="row"><span>Yaw</span><em id="ang-y">0°</em></div>
+  <div class="row"><span>Jaw open</span><em id="ang-j">0°</em></div>
+  <p>Animation state only. Not an encoder count and not a device range.</p>
+</aside>
+<footer>
+  <div class="chips" id="chips"></div>
+  <p class="caption" id="caption"></p>
+  <div class="controls">
+    <button class="ctrl" id="play" type="button">Play</button>
+    <div class="scrub-wrap">
+      <div class="ticks" id="ticks"></div>
+      <input id="scrub" type="range" min="0" max="1019" value="0" aria-label="Frame">
+    </div>
+  </div>
+  <div class="legend" aria-label="Color legend">
+    <span><i class="swatch path"></i>Pathway</span>
+    <span><i class="swatch act"></i>Actuation or energy</span>
+    <span><i class="swatch sense"></i>Sensing or state</span>
+  </div>
+</footer>
+<section class="about" id="about" hidden>
+  <h2>What this is</h2>
+  <p>A 34-second mechanical anatomy of a generic tendon-driven wristed instrument on a generic patient-side arm. Hardware stays in muted metal. Cyan, gold, and violet are diagram colors, not glowing parts.</p>
+  <h2>What this is not</h2>
+  <ul>
+    <li>Not a proprietary teardown and not a named surgical system.</li>
+    <li>No cable diameters, pulley ratios, encoder counts, or tip force sensing. Those are omitted, not measured as zero.</li>
+    <li>No clinical setup, energy settings, or steps for use on a patient.</li>
+    <li>Shaft roll is a fourth proximal input. It is not animated, so the section plane stays put.</li>
+  </ul>
+  <h2>How the model is organized</h2>
+  <ol id="transcript"></ol>
+  <h2>Product frame</h2>
+  <ol>
+    <li>Product: a frame-locked explainer of the mechanism.</li>
+    <li>Who it is for: engineers, trainees, and technical readers who need the causal path.</li>
+    <li>Why it is specific: continuous camera, sectional views, and an explicit refusal of invented specifications.</li>
+    <li>Structure: five stages, frames 0–149, 150–299, 300–509, 510–749, 750–1019.</li>
+    <li>Discovery: this page and its repository.</li>
+    <li>Engagement: play, scrub, or jump stages. Reduced motion stays on the chosen stage.</li>
+    <li>Conversion: comprehension. There is no lead form.</li>
+    <li>Money: none on this page. The pattern can be reused for other mechanisms.</li>
+    <li>Launch: static files. No account, no analytics tag, no secrets.</li>
+    <li>After launch: change jaw or arm geometry only with a sourced review. Do not add measurements without a source.</li>
+  </ol>
+  <p>Keys: Space plays or pauses. Arrow keys step one frame. Shift plus an arrow steps one second.</p>
+</section>
+<div id="boot"></div>
+<script>
+(function () {
+  "use strict";
+  window.addEventListener("error", function (ev) {
+    const boot = document.getElementById("boot");
+    const stack = ev.error && ev.error.stack ? ev.error.stack : "";
+    const text = String(ev.message || ev.error || "error") + " :: " + stack;
+    if (boot) boot.textContent = text;
+    const stage = document.getElementById("stage-name");
+    if (stage) stage.textContent = text.slice(0, 500);
+  });
+  const FPS = 30;
+  const LAST = 1019;
+  const PATH = [0.0, 0.898, 1.0];
+  const GOLD = [1.0, 0.820, 0.400];
+  const VIOLET = [0.616, 0.306, 0.867];
+  const BG = [0.043, 0.063, 0.098];
+  const HOUSING_C = [0.204, 0.259, 0.341];
+  const SHAFT_C = [0.55, 0.60, 0.66];
+  const BORE_C = [0.09, 0.11, 0.15];
+  const JOINT_C = [0.36, 0.42, 0.50];
+  const JAW_C = [0.68, 0.72, 0.76];
+  const GROOVE_C = [0.16, 0.18, 0.22];
+  const ARM_C = [0.18, 0.22, 0.28];
+  const CANNULA_C = [0.28, 0.34, 0.42];
+  const INSUL_C = [0.45, 0.42, 0.36];
+
+  const STAGES = [
+    { f: 0, name: "Housing and shaft" },
+    { f: 150, name: "Tendon routes" },
+    { f: 300, name: "Wrist and jaw" },
+    { f: 510, name: "Sensing and energy" },
+    { f: 750, name: "Complete system" }
+  ];
+
+  const CAPTIONS = [
+    { f0: 0, f1: 149, t: "The manipulator drives the instrument through the proximal housing. A rigid shaft carries that connection toward the wrist." },
+    { f0: 150, f1: 299, t: "Tendon paths run inside the shaft from those drive inputs to the wrist. The paths are a schematic. They are not a measured cable count or size." },
+    { f0: 300, f1: 429, t: "One side of an antagonistic pair shortens and the wrist rotates. Gold marks that shortening side in the diagram. It is not a force measurement." },
+    { f0: 430, f1: 509, t: "A separate pair opens and closes the jaws. The motion is slowed so the order of the joints is readable." },
+    { f0: 510, f1: 649, t: "The camera returns along the tendon path to the same proximal inputs." },
+    { f0: 650, f1: 749, t: "Angle sensing is drawn at those inputs. Distal joint position in this model is inferred from drive motion. Distal encoders and force feedback are not shown. The gold conductor is an optional insulated energy path, separate from the tendons. It is not a use instruction." },
+    { f0: 750, f1: 839, t: "The view pulls back along the same instrument. The optional energy path stays separate from the tendon routes as the arm comes into frame." },
+    { f0: 840, f1: 939, t: "The same instrument sits on a generic patient-side arm. The arm is revealed under time compression. Joint layout is illustrative." },
+    { f0: 940, f1: 1019, t: "The rings at the cannula mark a remote center of motion as a kinematic diagram. The instrument, drives, routes, and arm hold in one view. This is not a surgical setup." }
+  ];
+
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const params = new URLSearchParams(location.search);
+
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function smoother(t) {
+    t = clamp(t, 0, 1);
+    return t * t * t * (t * (t * 6 - 15) + 10);
+  }
+  function ease(frame, a, b, from, to) {
+    if (frame <= a) return from;
+    if (frame >= b) return to;
+    return lerp(from, to, smoother((frame - a) / (b - a)));
+  }
+  function window01(f, a, b, c, d) {
+    if (f < a || f >= d) return 0;
+    if (f < b) return smoother((f - a) / (b - a));
+    if (f < c) return 1;
+    return 1 - smoother((f - c) / (d - c));
+  }
+  function vsub(a, b) { return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]; }
+  function vadd(a, b) { return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]; }
+  function vscale(a, s) { return [a[0] * s, a[1] * s, a[2] * s]; }
+  function vdot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+  function vlen(a) { return Math.hypot(a[0], a[1], a[2]); }
+  function vnorm(a) {
+    const L = vlen(a) || 1;
+    return [a[0] / L, a[1] / L, a[2] / L];
+  }
+  function vcross(a, b) {
+    return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  }
+  function dist(a, b) { return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]); }
+
+  function mul(a, b, out) {
+    const a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
+    const a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
+    const a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
+    const a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+    const b00 = b[0], b01 = b[1], b02 = b[2], b03 = b[3];
+    const b10 = b[4], b11 = b[5], b12 = b[6], b13 = b[7];
+    const b20 = b[8], b21 = b[9], b22 = b[10], b23 = b[11];
+    const b30 = b[12], b31 = b[13], b32 = b[14], b33 = b[15];
+    out[0] = a00 * b00 + a10 * b01 + a20 * b02 + a30 * b03;
+    out[1] = a01 * b00 + a11 * b01 + a21 * b02 + a31 * b03;
+    out[2] = a02 * b00 + a12 * b01 + a22 * b02 + a32 * b03;
+    out[3] = a03 * b00 + a13 * b01 + a23 * b02 + a33 * b03;
+    out[4] = a00 * b10 + a10 * b11 + a20 * b12 + a30 * b13;
+    out[5] = a01 * b10 + a11 * b11 + a21 * b12 + a31 * b13;
+    out[6] = a02 * b10 + a12 * b11 + a22 * b12 + a32 * b13;
+    out[7] = a03 * b10 + a13 * b11 + a23 * b12 + a33 * b13;
+    out[8] = a00 * b20 + a10 * b21 + a20 * b22 + a30 * b23;
+    out[9] = a01 * b20 + a11 * b21 + a21 * b22 + a31 * b23;
+    out[10] = a02 * b20 + a12 * b21 + a22 * b22 + a32 * b23;
+    out[11] = a03 * b20 + a13 * b21 + a23 * b22 + a33 * b23;
+    out[12] = a00 * b30 + a10 * b31 + a20 * b32 + a30 * b33;
+    out[13] = a01 * b30 + a11 * b31 + a21 * b32 + a31 * b33;
+    out[14] = a02 * b30 + a12 * b31 + a22 * b32 + a32 * b33;
+    out[15] = a03 * b30 + a13 * b31 + a23 * b32 + a33 * b33;
+    return out;
+  }
+  function axisMatrix(axis, angle, pos, scale, out) {
+    const c = Math.cos(angle), s = Math.sin(angle);
+    const sx = scale[0], sy = scale[1], sz = scale[2];
+    if (axis === "x") {
+      out[0] = sx; out[1] = 0; out[2] = 0; out[3] = 0;
+      out[4] = 0; out[5] = c * sy; out[6] = s * sy; out[7] = 0;
+      out[8] = 0; out[9] = -s * sz; out[10] = c * sz; out[11] = 0;
+    } else if (axis === "y") {
+      out[0] = c * sx; out[1] = 0; out[2] = -s * sx; out[3] = 0;
+      out[4] = 0; out[5] = sy; out[6] = 0; out[7] = 0;
+      out[8] = s * sz; out[9] = 0; out[10] = c * sz; out[11] = 0;
+    } else {
+      out[0] = c * sx; out[1] = s * sx; out[2] = 0; out[3] = 0;
+      out[4] = -s * sy; out[5] = c * sy; out[6] = 0; out[7] = 0;
+      out[8] = 0; out[9] = 0; out[10] = sz; out[11] = 0;
+    }
+    out[12] = pos[0]; out[13] = pos[1]; out[14] = pos[2]; out[15] = 1;
+    return out;
+  }
+  function lookAt(eye, target, up, out) {
+    let zx = eye[0] - target[0], zy = eye[1] - target[1], zz = eye[2] - target[2];
+    let L = Math.hypot(zx, zy, zz) || 1;
+    zx /= L; zy /= L; zz /= L;
+    let xx = up[1] * zz - up[2] * zy;
+    let xy = up[2] * zx - up[0] * zz;
+    let xz = up[0] * zy - up[1] * zx;
+    L = Math.hypot(xx, xy, xz) || 1;
+    xx /= L; xy /= L; xz /= L;
+    const yx = zy * xz - zz * xy;
+    const yy = zz * xx - zx * xz;
+    const yz = zx * xy - zy * xx;
+    out[0] = xx; out[1] = yx; out[2] = zx; out[3] = 0;
+    out[4] = xy; out[5] = yy; out[6] = zy; out[7] = 0;
+    out[8] = xz; out[9] = yz; out[10] = zz; out[11] = 0;
+    out[12] = -(xx * eye[0] + xy * eye[1] + xz * eye[2]);
+    out[13] = -(yx * eye[0] + yy * eye[1] + yz * eye[2]);
+    out[14] = -(zx * eye[0] + zy * eye[1] + zz * eye[2]);
+    out[15] = 1;
+    return out;
+  }
+  function perspective(fovDeg, aspect, near, far, out) {
+    const f = 1 / Math.tan((fovDeg * Math.PI / 180) / 2);
+    out.fill(0);
+    out[0] = f / aspect;
+    out[5] = f;
+    out[10] = (far + near) / (near - far);
+    out[11] = -1;
+    out[14] = (2 * far * near) / (near - far);
+    return out;
+  }
+  function normalFromMat4(m, out) {
+    const a00 = m[0], a01 = m[1], a02 = m[2];
+    const a10 = m[4], a11 = m[5], a12 = m[6];
+    const a20 = m[8], a21 = m[9], a22 = m[10];
+    const b00 = a11 * a22 - a12 * a21;
+    const b01 = a12 * a20 - a10 * a22;
+    const b02 = a10 * a21 - a11 * a20;
+    const det = a00 * b00 + a01 * b01 + a02 * b02;
+    const id = det ? 1 / det : 1;
+    out[0] = b00 * id;
+    out[1] = (a21 * a02 - a22 * a01) * id;
+    out[2] = (a12 * a01 - a11 * a02) * id;
+    out[3] = b01 * id;
+    out[4] = (a22 * a00 - a20 * a02) * id;
+    out[5] = (a10 * a02 - a12 * a00) * id;
+    out[6] = b02 * id;
+    out[7] = (a20 * a01 - a21 * a00) * id;
+    out[8] = (a11 * a00 - a10 * a01) * id;
+    return out;
+  }
+  function transformPoint(m, p) {
+    return [
+      m[0] * p[0] + m[4] * p[1] + m[8] * p[2] + m[12],
+      m[1] * p[0] + m[5] * p[1] + m[9] * p[2] + m[13],
+      m[2] * p[0] + m[6] * p[1] + m[10] * p[2] + m[14]
+    ];
+  }
+  function linkMatrix(a, b, radius, out) {
+    const d = vsub(b, a);
+    const len = vlen(d) || 1;
+    const dir = vscale(d, 1 / len);
+    const helper = Math.abs(dir[1]) > 0.85 ? [1, 0, 0] : [0, 1, 0];
+    const right = vnorm(vcross(helper, dir));
+    const up = vcross(dir, right);
+    const mid = vscale(vadd(a, b), 0.5);
+    out[0] = right[0] * radius; out[1] = right[1] * radius; out[2] = right[2] * radius; out[3] = 0;
+    out[4] = up[0] * radius; out[5] = up[1] * radius; out[6] = up[2] * radius; out[7] = 0;
+    out[8] = dir[0] * len; out[9] = dir[1] * len; out[10] = dir[2] * len; out[11] = 0;
+    out[12] = mid[0]; out[13] = mid[1]; out[14] = mid[2]; out[15] = 1;
+    return out;
+  }
+
+  function pitchDeg(f) {
+    if (f < 300) return 0;
+    if (f < 370) return ease(f, 300, 370, 0, 26);
+    if (f < 450) return ease(f, 370, 450, 26, -18);
+    return ease(f, 450, 509, -18, 16);
+  }
+  function yawDeg(f) {
+    if (f < 330) return 0;
+    if (f < 410) return ease(f, 330, 410, 0, 30);
+    if (f < 470) return ease(f, 410, 470, 30, -14);
+    return ease(f, 470, 509, -14, 20);
+  }
+  function jawDeg(f) {
+    if (f < 430) return 3;
+    if (f < 490) return ease(f, 430, 490, 3, 32);
+    return ease(f, 490, 509, 32, 18);
+  }
+
+  const CAM_KEYS = [
+    { f: 0, eye: [-4.8, 1.55, -4.15], target: [0.02, -0.22, 1.15], fov: 34 },
+    { f: 149, eye: [-4.4, 1.45, -1.35], target: [0.04, -0.08, 4.6], fov: 32 },
+    { f: 230, eye: [-4.3, 1.56, 4.7], target: [0.0, 0.02, 9.6], fov: 31 },
+    { f: 299, eye: [-2.15, 0.9, 9.7], target: [0.0, 0.04, 12.25], fov: 30 },
+    { f: 410, eye: [-2.35, 0.95, 11.7], target: [0.06, 0.08, 13.05], fov: 32 },
+    { f: 509, eye: [-2.55, 0.72, 12.35], target: [0.08, 0.04, 13.35], fov: 30 },
+    { f: 680, eye: [-5.4, 1.7, -4.15], target: [0.02, -0.12, 1.35], fov: 36 },
+    { f: 749, eye: [-14.2, 4.8, -3.2], target: [0.0, 0.2, 5.6], fov: 34 },
+    { f: 880, eye: [-19.5, 7.2, -5.4], target: [-0.3, 0.85, 3.2], fov: 34 },
+    { f: 980, eye: [-26.5, 10.2, -7.4], target: [-0.6, 1.05, 2.2], fov: 34 },
+    { f: 1019, eye: [-26.5, 10.2, -7.4], target: [-0.6, 1.05, 2.2], fov: 34 }
+  ];
+
+  function sampleKeys(frame) {
+    const keys = CAM_KEYS;
+    if (frame <= keys[0].f) return keys[0];
+    for (let i = 0; i < keys.length - 1; i++) {
+      const a = keys[i], b = keys[i + 1];
+      if (frame <= b.f) {
+        const t = smoother((frame - a.f) / (b.f - a.f));
+        return {
+          eye: [lerp(a.eye[0], b.eye[0], t), lerp(a.eye[1], b.eye[1], t), lerp(a.eye[2], b.eye[2], t)],
+          target: [lerp(a.target[0], b.target[0], t), lerp(a.target[1], b.target[1], t), lerp(a.target[2], b.target[2], t)],
+          fov: lerp(a.fov, b.fov, t)
+        };
+      }
+    }
+    return keys[keys.length - 1];
+  }
+
+  function pushTri(dst, cursor, ax, an, bx, bn, cx, cn) {
+    dst[cursor++] = ax[0]; dst[cursor++] = ax[1]; dst[cursor++] = ax[2];
+    dst[cursor++] = an[0]; dst[cursor++] = an[1]; dst[cursor++] = an[2];
+    dst[cursor++] = bx[0]; dst[cursor++] = bx[1]; dst[cursor++] = bx[2];
+    dst[cursor++] = bn[0]; dst[cursor++] = bn[1]; dst[cursor++] = bn[2];
+    dst[cursor++] = cx[0]; dst[cursor++] = cx[1]; dst[cursor++] = cx[2];
+    dst[cursor++] = cn[0]; dst[cursor++] = cn[1]; dst[cursor++] = cn[2];
+    return cursor;
+  }
+
+  function buildInterleaved(builder) {
+    const tmp = [];
+    builder(tmp);
+    return new Float32Array(tmp);
+  }
+
+  function addVert(tmp, p, n) {
+    tmp.push(p[0], p[1], p[2], n[0], n[1], n[2]);
+  }
+
+  function cylinderData(inward) {
+    return buildInterleaved(function (tmp) {
+      const seg = 28;
+      const sdir = inward ? -1 : 1;
+      for (let i = 0; i < seg; i++) {
+        const a0 = (i / seg) * Math.PI * 2;
+        const a1 = ((i + 1) / seg) * Math.PI * 2;
+        const c0 = Math.cos(a0), s0 = Math.sin(a0);
+        const c1 = Math.cos(a1), s1 = Math.sin(a1);
+        const n0 = [sdir * c0, sdir * s0, 0];
+        const n1 = [sdir * c1, sdir * s1, 0];
+        const p00 = [c0, s0, -0.5], p01 = [c0, s0, 0.5];
+        const p10 = [c1, s1, -0.5], p11 = [c1, s1, 0.5];
+        if (!inward) {
+          addVert(tmp, p01, n0); addVert(tmp, p00, n0); addVert(tmp, p10, n1);
+          addVert(tmp, p01, n0); addVert(tmp, p10, n1); addVert(tmp, p11, n1);
+        } else {
+          addVert(tmp, p00, n0); addVert(tmp, p01, n0); addVert(tmp, p11, n1);
+          addVert(tmp, p00, n0); addVert(tmp, p11, n1); addVert(tmp, p10, n1);
+        }
+      }
+    });
+  }
+
+  function cylinderCappedData() {
+    return buildInterleaved(function (tmp) {
+      const seg = 24;
+      for (let i = 0; i < seg; i++) {
+        const a0 = (i / seg) * Math.PI * 2;
+        const a1 = ((i + 1) / seg) * Math.PI * 2;
+        const c0 = Math.cos(a0), s0 = Math.sin(a0);
+        const c1 = Math.cos(a1), s1 = Math.sin(a1);
+        const n0 = [c0, s0, 0], n1 = [c1, s1, 0];
+        addVert(tmp, [c0, s0, 0.5], n0);
+        addVert(tmp, [c0, s0, -0.5], n0);
+        addVert(tmp, [c1, s1, -0.5], n1);
+        addVert(tmp, [c0, s0, 0.5], n0);
+        addVert(tmp, [c1, s1, -0.5], n1);
+        addVert(tmp, [c1, s1, 0.5], n1);
+        addVert(tmp, [0, 0, 0.5], [0, 0, 1]);
+        addVert(tmp, [c0, s0, 0.5], [0, 0, 1]);
+        addVert(tmp, [c1, s1, 0.5], [0, 0, 1]);
+        addVert(tmp, [0, 0, -0.5], [0, 0, -1]);
+        addVert(tmp, [c1, s1, -0.5], [0, 0, -1]);
+        addVert(tmp, [c0, s0, -0.5], [0, 0, -1]);
+      }
+    });
+  }
+
+  function boxData() {
+    const p = [
+      [-0.5, -0.5, -0.5], [0.5, -0.5, -0.5], [0.5, 0.5, -0.5], [-0.5, 0.5, -0.5],
+      [-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [0.5, 0.5, 0.5], [-0.5, 0.5, 0.5]
+    ];
+    const faces = [
+      [4, 5, 6, 4, 6, 7, [0, 0, 1]],
+      [1, 0, 3, 1, 3, 2, [0, 0, -1]],
+      [3, 7, 6, 3, 6, 2, [0, 1, 0]],
+      [0, 1, 5, 0, 5, 4, [0, -1, 0]],
+      [1, 2, 6, 1, 6, 5, [1, 0, 0]],
+      [4, 7, 3, 4, 3, 0, [-1, 0, 0]]
+    ];
+    return buildInterleaved(function (tmp) {
+      faces.forEach(function (f) {
+        const n = f[6];
+        addVert(tmp, p[f[0]], n); addVert(tmp, p[f[1]], n); addVert(tmp, p[f[2]], n);
+        addVert(tmp, p[f[3]], n); addVert(tmp, p[f[4]], n); addVert(tmp, p[f[5]], n);
+      });
+    });
+  }
+
+  function taperedBoxData(x0, x1, y0a, y1a, y0b, y1b, z0, z1) {
+    const p = [
+      [-x0, y0a, z0], [x0, y0a, z0], [x0, y1a, z0], [-x0, y1a, z0],
+      [-x1, y0b, z1], [x1, y0b, z1], [x1, y1b, z1], [-x1, y1b, z1]
+    ];
+    const faces = [
+      [4, 5, 6], [4, 6, 7],
+      [1, 0, 3], [1, 3, 2],
+      [3, 7, 6], [3, 6, 2],
+      [0, 1, 5], [0, 5, 4],
+      [1, 2, 6], [1, 6, 5],
+      [4, 7, 3], [4, 3, 0]
+    ];
+    return buildInterleaved(function (tmp) {
+      faces.forEach(function (f) {
+        const a = p[f[0]], b = p[f[1]], c = p[f[2]];
+        const n = vnorm(vcross(vsub(b, a), vsub(c, a)));
+        addVert(tmp, a, n); addVert(tmp, b, n); addVert(tmp, c, n);
+      });
+    });
+  }
+
+  function sphereData() {
+    return buildInterleaved(function (tmp) {
+      const seg = 18, rings = 12;
+      for (let i = 0; i < rings; i++) {
+        const v0 = (i / rings) * Math.PI;
+        const v1 = ((i + 1) / rings) * Math.PI;
+        for (let j = 0; j < seg; j++) {
+          const u0 = (j / seg) * Math.PI * 2;
+          const u1 = ((j + 1) / seg) * Math.PI * 2;
+          const pnt = function (u, v) {
+            const s = Math.sin(v);
+            return [Math.cos(u) * s, Math.cos(v), Math.sin(u) * s];
+          };
+          const a = pnt(u0, v0), b = pnt(u1, v0), c = pnt(u0, v1), d = pnt(u1, v1);
+          addVert(tmp, a, a); addVert(tmp, c, c); addVert(tmp, b, b);
+          addVert(tmp, b, b); addVert(tmp, c, c); addVert(tmp, d, d);
+        }
+      }
+    });
+  }
+
+  function torusData(R, r) {
+    return buildInterleaved(function (tmp) {
+      const maj = 28, min = 12;
+      for (let i = 0; i < maj; i++) {
+        const t0 = (i / maj) * Math.PI * 2;
+        const t1 = ((i + 1) / maj) * Math.PI * 2;
+        for (let j = 0; j < min; j++) {
+          const p0 = (j / min) * Math.PI * 2;
+          const p1 = ((j + 1) / min) * Math.PI * 2;
+          const pt = function (t, p) {
+            const cr = R + r * Math.cos(p);
+            return [cr * Math.cos(t), cr * Math.sin(t), r * Math.sin(p)];
+          };
+          const nr = function (t, p) {
+            return [Math.cos(p) * Math.cos(t), Math.cos(p) * Math.sin(t), Math.sin(p)];
+          };
+          const a = pt(t0, p0), b = pt(t1, p0), c = pt(t0, p1), d = pt(t1, p1);
+          const na = nr(t0, p0), nb = nr(t1, p0), nc = nr(t0, p1), nd = nr(t1, p1);
+          addVert(tmp, a, na); addVert(tmp, c, nc); addVert(tmp, b, nb);
+          addVert(tmp, b, nb); addVert(tmp, c, nc); addVert(tmp, d, nd);
+        }
+      }
+    });
+  }
+
+  function gridData() {
+    return buildInterleaved(function (tmp) {
+      const y = -1.48;
+      const n = [0, 1, 0];
+      for (let i = -8; i <= 8; i++) {
+        addVert(tmp, [i, y, -10], n); addVert(tmp, [i, y, 16], n);
+      }
+      for (let k = -10; k <= 16; k++) {
+        addVert(tmp, [-8, y, k], n); addVert(tmp, [8, y, k], n);
+      }
+    });
+  }
+
+  const canvas = document.getElementById("view");
+  const gl = canvas.getContext("webgl2", { antialias: true, alpha: false, preserveDrawingBuffer: true });
+  if (!gl) {
+    document.getElementById("boot").textContent = "WebGL2 is not available in this browser.";
+    return;
+  }
+
+  const VERT = `#version 300 es
+layout(location=0) in vec3 a_pos;
+layout(location=1) in vec3 a_nrm;
+uniform mat4 u_mvp;
+uniform mat4 u_model;
+uniform mat3 u_nmat;
+out vec3 v_n;
+out vec3 v_w;
+void main() {
+  vec4 w = u_model * vec4(a_pos, 1.0);
+  v_w = w.xyz;
+  v_n = u_nmat * a_nrm;
+  gl_Position = u_mvp * vec4(a_pos, 1.0);
+}`;
+  const FRAG = `#version 300 es
+precision highp float;
+in vec3 v_n;
+in vec3 v_w;
+uniform vec3 u_color;
+uniform vec3 u_cam;
+uniform vec3 u_bg;
+uniform float u_alpha;
+uniform float u_mode;
+uniform float u_clipOn;
+uniform vec4 u_clip;
+uniform float u_fog;
+out vec4 frag;
+void main() {
+  if (u_clipOn > 0.5 && dot(u_clip.xyz, v_w) + u_clip.w < 0.0) discard;
+  vec3 N = normalize(v_n);
+  vec3 V = normalize(u_cam - v_w);
+  vec3 L1 = normalize(vec3(-0.45, 0.82, 0.22));
+  vec3 L2 = normalize(vec3(0.72, 0.12, 0.15));
+  float wrap = clamp(dot(N, L1) * 0.55 + 0.45, 0.0, 1.0);
+  float fill = clamp(dot(N, L2) * 0.35 + 0.62, 0.0, 1.0);
+  vec3 col;
+  if (u_mode < 0.5) {
+    float spec = pow(max(dot(reflect(-L1, N), V), 0.0), 42.0) * 0.14;
+    float rim = pow(1.0 - max(dot(N, V), 0.0), 2.2) * 0.06;
+    float back = smoothstep(0.05, -0.25, dot(N, V));
+    col = u_color * (0.18 + 0.62 * wrap + 0.16 * fill) + vec3(spec) + rim;
+    col *= mix(1.0, 0.62, back);
+  } else {
+    col = u_color * (0.78 + 0.22 * wrap);
+  }
+  float fog = smoothstep(16.0, 40.0, length(u_cam - v_w)) * u_fog;
+  col = mix(col, u_bg, fog);
+  frag = vec4(col, u_alpha);
+}`;
+
+  function compile(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+      throw new Error(gl.getShaderInfoLog(s) || "shader");
+    }
+    return s;
+  }
+  let prog;
+  try {
+    prog = gl.createProgram();
+    gl.attachShader(prog, compile(gl.VERTEX_SHADER, VERT));
+    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, FRAG));
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+      throw new Error(gl.getProgramInfoLog(prog) || "link");
+    }
+  } catch (err) {
+    document.getElementById("boot").textContent = String(err.message || err);
+    return;
+  }
+  gl.useProgram(prog);
+  const U = {
+    mvp: gl.getUniformLocation(prog, "u_mvp"),
+    model: gl.getUniformLocation(prog, "u_model"),
+    nmat: gl.getUniformLocation(prog, "u_nmat"),
+    color: gl.getUniformLocation(prog, "u_color"),
+    cam: gl.getUniformLocation(prog, "u_cam"),
+    bg: gl.getUniformLocation(prog, "u_bg"),
+    alpha: gl.getUniformLocation(prog, "u_alpha"),
+    mode: gl.getUniformLocation(prog, "u_mode"),
+    clipOn: gl.getUniformLocation(prog, "u_clipOn"),
+    clip: gl.getUniformLocation(prog, "u_clip"),
+    fog: gl.getUniformLocation(prog, "u_fog")
+  };
+  gl.uniform3fv(U.bg, BG);
+
+  function uploadStatic(data, mode) {
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 24, 0);
+    gl.enableVertexAttribArray(1);
+    gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12);
+    gl.bindVertexArray(null);
+    return { vao: vao, mode: mode || gl.TRIANGLES, count: data.length / 6 };
+  }
+  function makeDynamic() {
+    const vao = gl.createVertexArray();
+    const buf = gl.createBuffer();
+    gl.bindVertexArray(vao);
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, 48000, gl.DYNAMIC_DRAW);
+    gl.enableVertexAttribArray(0);
+    gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 24, 0);
+    gl.enableVertexAttribArray(1);
+    gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 24, 12);
+    gl.bindVertexArray(null);
+    return { vao: vao, buf: buf, count: 0, data: new Float32Array(8000) };
+  }
+
+  const MESH = {
+    cyl: uploadStatic(cylinderData(false)),
+    cylIn: uploadStatic(cylinderData(true)),
+    cylCap: uploadStatic(cylinderCappedData()),
+    box: uploadStatic(boxData()),
+    sphere: uploadStatic(sphereData()),
+    pulley: uploadStatic(torusData(0.105, 0.02)),
+    pulleySm: uploadStatic(torusData(0.072, 0.016)),
+    ring: uploadStatic(torusData(0.30, 0.02)),
+    port: uploadStatic(torusData(0.95, 0.018)),
+    port2: uploadStatic(torusData(1.25, 0.012)),
+    grid: uploadStatic(gridData(), gl.LINES),
+    jawU: uploadStatic(taperedBoxData(0.075, 0.028, 0.012, 0.095, 0.008, 0.038, 0.0, 0.78)),
+    jawL: uploadStatic(taperedBoxData(0.075, 0.028, -0.095, -0.012, -0.038, -0.008, 0.0, 0.78))
+  };
+
+  const root = {
+    children: [],
+    name: "root",
+    axis: "y",
+    angle: 0,
+    pos: [0, 0, 0],
+    scale: [1, 1, 1],
+    alpha: 0,
+    local: new Float32Array(16),
+    world: new Float32Array(16),
+    nmat: new Float32Array(9)
+  };
+
+  function makeNode(parent, spec) {
+    const n = {
+      parent: parent,
+      children: [],
+      name: spec.name || "",
+      mesh: spec.mesh || null,
+      axis: spec.axis || "y",
+      angle: spec.angle || 0,
+      pos: spec.pos || [0, 0, 0],
+      scale: spec.scale || [1, 1, 1],
+      color: spec.color || HOUSING_C,
+      mode: spec.mode || 0,
+      alpha: spec.alpha == null ? 1 : spec.alpha,
+      clip: spec.clip || 0,
+      draw: spec.draw || "auto",
+      local: new Float32Array(16),
+      world: new Float32Array(16),
+      nmat: new Float32Array(9)
+    };
+    parent.children.push(n);
+    return n;
+  }
+
+  const housing = makeNode(root, { name: "housing", mesh: MESH.box, pos: [0, 0.02, -0.9], scale: [1.42, 1.16, 1.52], color: HOUSING_C, clip: 3 });
+  makeNode(root, { name: "rib", mesh: MESH.box, pos: [0, 0.64, -0.9], scale: [0.72, 0.08, 1.2], color: [0.24, 0.30, 0.38] });
+  makeNode(root, { name: "bush", mesh: MESH.cylCap, pos: [0, 0, -0.02], scale: [0.30, 0.30, 0.36], color: JOINT_C });
+  const shaft = makeNode(root, { name: "shaft", mesh: MESH.cyl, pos: [0, 0, 5.91], scale: [0.18, 0.18, 11.82], color: SHAFT_C, clip: 1 });
+  makeNode(root, { name: "bore", mesh: MESH.cylIn, pos: [0, 0, 5.95], scale: [0.142, 0.142, 11.5], color: BORE_C, clip: 1 });
+  makeNode(root, { name: "collar", mesh: MESH.cylCap, pos: [0, 0, 11.72], scale: [0.25, 0.25, 0.28], color: JOINT_C });
+
+  const diskPos = [[0.36, 0.30], [-0.36, 0.30], [0.36, -0.26], [-0.36, -0.26]];
+  const disks = diskPos.map(function (p, i) {
+    const d = makeNode(root, { name: "disk" + i, mesh: MESH.cylCap, pos: [p[0], p[1], -1.76], scale: [0.24, 0.24, 0.12], color: [0.27, 0.33, 0.42] });
+    makeNode(d, { mesh: MESH.box, pos: [0, 0, -0.55], scale: [0.7, 0.08, 0.2], color: GROOVE_C });
+    makeNode(d, { mesh: MESH.box, pos: [0, 0, -0.55], scale: [0.08, 0.7, 0.2], color: GROOVE_C });
+    makeNode(root, { name: "enc" + i, mesh: MESH.ring, axis: "z", pos: [p[0], p[1], -1.86], color: VIOLET, mode: 1, alpha: 0 });
+    return d;
+  });
+
+  const pitch = makeNode(root, { name: "pitch", pos: [0, 0, 11.95], axis: "x" });
+  makeNode(pitch, { mesh: MESH.pulley, axis: "y", angle: Math.PI / 2, color: JOINT_C });
+  makeNode(pitch, { name: "pinP", mesh: MESH.cylCap, axis: "y", angle: Math.PI / 2, scale: [0.035, 0.035, 0.46], color: [0.45, 0.49, 0.54] });
+  makeNode(pitch, { mesh: MESH.box, pos: [0, 0.15, 0.22], scale: [0.06, 0.05, 0.42], color: JOINT_C });
+  makeNode(pitch, { mesh: MESH.box, pos: [0, -0.15, 0.22], scale: [0.06, 0.05, 0.42], color: JOINT_C });
+  makeNode(pitch, { name: "shell", mesh: MESH.cyl, pos: [0, 0, 0.28], scale: [0.34, 0.34, 0.85], color: [0.25, 0.30, 0.38], clip: 2, alpha: 1 });
+  const pitchA = makeNode(pitch, { name: "pitchA", pos: [0, 0.105, 0] });
+  const pitchB = makeNode(pitch, { name: "pitchB", pos: [0, -0.105, 0] });
+  const gYawA = makeNode(pitch, { name: "gYawA", pos: [0.06, 0.05, 0.24] });
+  const gYawB = makeNode(pitch, { name: "gYawB", pos: [0.06, -0.05, 0.24] });
+  const gJawA = makeNode(pitch, { name: "gJawA", pos: [-0.05, 0.04, 0.24] });
+  const gJawB = makeNode(pitch, { name: "gJawB", pos: [-0.05, -0.04, 0.24] });
+
+  const yaw = makeNode(pitch, { name: "yaw", pos: [0, 0, 0.50], axis: "y" });
+  makeNode(yaw, { mesh: MESH.pulley, axis: "x", angle: Math.PI / 2, color: JOINT_C });
+  makeNode(yaw, { mesh: MESH.cylCap, axis: "x", angle: Math.PI / 2, scale: [0.03, 0.03, 0.34], color: [0.45, 0.49, 0.54] });
+  makeNode(yaw, { mesh: MESH.box, pos: [0, 0, 0.16], scale: [0.16, 0.12, 0.28], color: JOINT_C });
+  const yawA = makeNode(yaw, { name: "yawA", pos: [0.105, 0, 0] });
+  const yawB = makeNode(yaw, { name: "yawB", pos: [-0.105, 0, 0] });
+
+  const jawP = makeNode(yaw, { name: "jawP", pos: [0, 0, 0.36] });
+  makeNode(jawP, { mesh: MESH.pulleySm, axis: "y", angle: Math.PI / 2, color: JOINT_C });
+  const jawAttA = makeNode(jawP, { name: "jawAttA", pos: [0, 0.072, 0] });
+  const jawAttB = makeNode(jawP, { name: "jawAttB", pos: [0, -0.072, 0] });
+  const upper = makeNode(jawP, { name: "upper", axis: "x", mesh: MESH.jawU, color: JAW_C });
+  const lower = makeNode(jawP, { name: "lower", axis: "x", mesh: MESH.jawL, color: JAW_C });
+  for (let i = 0; i < 4; i++) {
+    const z = 0.18 + i * 0.13;
+    makeNode(upper, { mesh: MESH.box, pos: [0, 0.02, z], scale: [0.09, 0.012, 0.035], color: GROOVE_C });
+    makeNode(lower, { mesh: MESH.box, pos: [0, -0.02, z], scale: [0.09, 0.012, 0.035], color: GROOVE_C });
+  }
+  const electrode = makeNode(upper, { name: "electrode", mesh: MESH.box, pos: [0, 0.03, 0.62], scale: [0.055, 0.02, 0.16], color: [0.72, 0.62, 0.40], mode: 1, alpha: 0 });
+
+  const cannula = makeNode(root, { name: "cannula", mesh: MESH.cyl, pos: [0, 0, 8.55], scale: [0.30, 0.30, 1.7], color: CANNULA_C, alpha: 0 });
+  makeNode(root, { name: "cannulaIn", mesh: MESH.cylIn, pos: [0, 0, 8.55], scale: [0.24, 0.24, 1.62], color: BORE_C, alpha: 0, parentAlpha: "cannula" });
+  const seal = makeNode(root, { name: "seal", mesh: MESH.pulley, axis: "z", pos: [0, 0, 7.78], scale: [3.15, 3.15, 3.15], color: JOINT_C, alpha: 0 });
+  const port = makeNode(root, { name: "port", mesh: MESH.port, axis: "z", pos: [0, 0, 8.55], color: VIOLET, mode: 1, alpha: 0 });
+  const port2 = makeNode(root, { name: "port2", mesh: MESH.port2, axis: "z", pos: [0, 0, 8.55], color: VIOLET, mode: 1, alpha: 0 });
+
+  const mount = [0, 0.05, -2.15];
+  const jW = [0.05, 0.85, -3.35];
+  const jE = [0.1, 2.35, -5.05];
+  const jS = [-0.05, 3.15, -7.15];
+  const jBaseTop = [-0.1, 1.15, -8.55];
+  const jBaseBot = [-0.1, -1.38, -8.55];
+  const armLinks = [
+    { name: "coupler", a: [0, 0.02, -1.66], b: mount, r: 0.16, f0: 760, f1: 810 },
+    { name: "forearm", a: mount, b: jW, r: 0.18, f0: 790, f1: 850 },
+    { name: "arm2", a: jW, b: jE, r: 0.2, f0: 825, f1: 885 },
+    { name: "arm1", a: jE, b: jS, r: 0.22, f0: 855, f1: 915 },
+    { name: "upright", a: jS, b: jBaseTop, r: 0.2, f0: 885, f1: 940 },
+    { name: "column", a: jBaseTop, b: jBaseBot, r: 0.28, f0: 900, f1: 955 }
+  ];
+  armLinks.forEach(function (L) {
+    L.node = makeNode(root, { name: L.name, mesh: MESH.cylCap, color: ARM_C, alpha: 0, draw: "arm" });
+    L.world = new Float32Array(16);
+  });
+  const foot = makeNode(root, { name: "foot", mesh: MESH.cylCap, axis: "x", angle: Math.PI / 2, pos: [-0.1, -1.42, -8.55], scale: [0.72, 0.72, 0.08], color: ARM_C, alpha: 0 });
+  const joints = [mount, jW, jE, jS, jBaseTop];
+  const jointNodes = joints.map(function (p, i) {
+    return makeNode(root, { name: "jn" + i, mesh: MESH.sphere, pos: p, scale: [0.22, 0.22, 0.22], color: [0.22, 0.27, 0.34], alpha: 0 });
+  });
+
+  const byName = {};
+  (function index(n) {
+    if (n.name) byName[n.name] = n;
+    n.children.forEach(index);
+  })(root);
+
+  function updateTree(n, parentWorld) {
+    axisMatrix(n.axis, n.angle, n.pos, n.scale, n.local);
+    if (parentWorld) mul(parentWorld, n.local, n.world);
+    else n.world.set(n.local);
+    normalFromMat4(n.world, n.nmat);
+    n.children.forEach(function (c) { updateTree(c, n.world); });
+  }
+
+  const dyn = [];
+  for (let i = 0; i < 72; i++) dyn.push(makeDynamic());
+
+  function tubeInto(slot, points, radius) {
+    if (!points || points.length < 2) { slot.count = 0; return; }
+    const sides = 8;
+    const dst = slot.data;
+    let cursor = 0;
+    const tangents = [];
+    for (let i = 0; i < points.length; i++) {
+      const a = points[Math.max(0, i - 1)];
+      const b = points[Math.min(points.length - 1, i + 1)];
+      tangents.push(vnorm(vsub(b, a)));
+    }
+    let prevN = [0, 1, 0];
+    const rings = [];
+    for (let i = 0; i < points.length; i++) {
+      const t = tangents[i];
+      let n = vsub(prevN, vscale(t, vdot(prevN, t)));
+      if (vlen(n) < 1e-4) {
+        const h = Math.abs(t[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0];
+        n = vcross(h, t);
+      }
+      n = vnorm(n);
+      prevN = n;
+      const b = vcross(t, n);
+      const ring = [];
+      for (let s = 0; s < sides; s++) {
+        const a = (s / sides) * Math.PI * 2;
+        const c = Math.cos(a), sn = Math.sin(a);
+        const nn = vadd(vscale(n, c), vscale(b, sn));
+        ring.push({ p: vadd(points[i], vscale(nn, radius)), n: nn });
+      }
+      rings.push(ring);
+    }
+    for (let i = 0; i < rings.length - 1; i++) {
+      for (let s = 0; s < sides; s++) {
+        const s2 = (s + 1) % sides;
+        const a = rings[i][s], b = rings[i][s2], c = rings[i + 1][s], d = rings[i + 1][s2];
+        cursor = pushTri(dst, cursor, a.p, a.n, c.p, c.n, b.p, b.n);
+        cursor = pushTri(dst, cursor, b.p, b.n, c.p, c.n, d.p, d.n);
+      }
+    }
+    slot.count = cursor / 6;
+    gl.bindBuffer(gl.ARRAY_BUFFER, slot.buf);
+    gl.bufferData(gl.ARRAY_BUFFER, dst.subarray(0, cursor), gl.DYNAMIC_DRAW);
+  }
+
+  function polyLen(pts) {
+    let L = 0;
+    for (let i = 1; i < pts.length; i++) L += dist(pts[i], pts[i - 1]);
+    return L;
+  }
+  function pointAlong(pts, t) {
+    const total = polyLen(pts) || 1;
+    let d = total * clamp(t, 0, 1);
+    for (let i = 1; i < pts.length; i++) {
+      const a = pts[i - 1], b = pts[i];
+      const seg = dist(a, b);
+      if (d <= seg || i === pts.length - 1) {
+        const u = seg < 1e-6 ? 0 : d / seg;
+        return [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)];
+      }
+      d -= seg;
+    }
+    return pts[pts.length - 1];
+  }
+  function subPoly(pts, t0, t1) {
+    const n = 7;
+    const out = [];
+    for (let i = 0; i <= n; i++) out.push(pointAlong(pts, t0 + (t1 - t0) * (i / n)));
+    return out;
+  }
+
+  const IDENT = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+  const viewM = new Float32Array(16);
+  const projM = new Float32Array(16);
+  const vp = new Float32Array(16);
+  const mvp = new Float32Array(16);
+  const modelDyn = IDENT;
+
+  function drawMesh(mesh, model, nmat, color, alpha, mode, clipOn, clipPlane) {
+    if (!mesh || alpha < 0.02 || !mesh.count) return;
+    gl.bindVertexArray(mesh.vao);
+    gl.uniformMatrix4fv(U.model, false, model);
+    gl.uniformMatrix3fv(U.nmat, false, nmat);
+    mul(vp, model, mvp);
+    gl.uniformMatrix4fv(U.mvp, false, mvp);
+    gl.uniform3fv(U.color, color);
+    gl.uniform1f(U.alpha, alpha);
+    gl.uniform1f(U.mode, mode);
+    gl.uniform1f(U.clipOn, clipOn ? 1 : 0);
+    gl.uniform4fv(U.clip, clipPlane || [1, 0, 0, -10]);
+    gl.drawArrays(mesh.mode || gl.TRIANGLES, 0, mesh.count);
+  }
+
+  const opaque = [];
+  const blended = [];
+  function collect(n) {
+    if (n.mesh && n.alpha > 0.02) {
+      if (n.alpha < 0.98 || n.mode === 1) blended.push(n);
+      else opaque.push(n);
+    }
+    n.children.forEach(collect);
+  }
+
+  let dpr = 1;
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+    const w = Math.max(2, Math.floor(canvas.clientWidth * dpr));
+    const h = Math.max(2, Math.floor(canvas.clientHeight * dpr));
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+    }
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+
+  function pose(frame) {
+    const p = pitchDeg(frame) * Math.PI / 180;
+    const y = yawDeg(frame) * Math.PI / 180;
+    const j = jawDeg(frame) * Math.PI / 180;
+    pitch.angle = p;
+    yaw.angle = y;
+    upper.angle = -j;
+    lower.angle = j;
+    const shaftS = Math.max(window01(frame, 136, 188, 328, 368), window01(frame, 688, 735, 800, 860));
+    const wristS = window01(frame, 308, 350, 530, 580);
+    const houseS = window01(frame, 648, 700, 790, 850);
+    const energy = window01(frame, 704, 770, 1019, 1020);
+    const sense = window01(frame, 636, 690, 1019, 1020);
+    const trace = (frame < 168 || frame > 299) ? -1 : smoother((frame - 168) / 120);
+    const cannulaA = window01(frame, 755, 830, 1019, 1020);
+    const portA = window01(frame, 830, 900, 1019, 1020);
+    byName.shell.alpha = 0.55 + 0.45 * (1 - wristS);
+    [0, 1, 2, 3].forEach(function (i) { byName["enc" + i].alpha = sense * (frame > 900 ? 0.75 : 1); });
+    electrode.alpha = energy;
+    cannula.alpha = cannulaA;
+    byName.cannulaIn.alpha = cannulaA;
+    seal.alpha = cannulaA;
+    port.alpha = portA * 0.9;
+    port2.alpha = portA * 0.45;
+    armLinks.forEach(function (L) { L.node.alpha = window01(frame, L.f0, L.f1, 1019, 1020); });
+    const footA = window01(frame, 900, 955, 1019, 1020);
+    foot.alpha = footA;
+    jointNodes.forEach(function (n, i) {
+      const src = armLinks[Math.min(i + 1, armLinks.length - 1)];
+      n.alpha = window01(frame, src.f0, src.f1, 1019, 1020);
+    });
+    updateTree(root, null);
+    armLinks.forEach(function (L) {
+      linkMatrix(L.a, L.b, L.r, L.node.world);
+      normalFromMat4(L.node.world, L.node.nmat);
+    });
+    return {
+      frame: frame,
+      shaftS: shaftS,
+      wristS: wristS,
+      houseS: houseS,
+      energy: energy,
+      sense: sense,
+      trace: trace,
+      pitch: pitchDeg(frame),
+      yaw: yawDeg(frame),
+      jaw: jawDeg(frame)
+    };
+  }
+
+  function routes() {
+    const wp = function (n) { return [n.world[12], n.world[13], n.world[14]]; };
+    const exit = function (x, y) { return [x, y, 11.62]; };
+    const mouth = function (x, y) { return [x, y, 0.35]; };
+    function line(xy, guides) {
+      const pts = [mouth(xy[0], xy[1]), exit(xy[0], xy[1])];
+      guides.forEach(function (g) { pts.push(wp(g)); });
+      return pts;
+    }
+    return [
+      { id: "pitchA", pts: line([0.07, 0.03], [pitchA]), pair: "pitch" },
+      { id: "pitchB", pts: line([-0.07, 0.03], [pitchB]), pair: "pitch" },
+      { id: "yawA", pts: line([0.035, 0.07], [gYawA, yawA]), pair: "yaw" },
+      { id: "yawB", pts: line([0.035, -0.07], [gYawB, yawB]), pair: "yaw" },
+      { id: "jawA", pts: line([-0.045, 0.045], [gJawA, jawAttA]), pair: "jaw" },
+      { id: "jawB", pts: line([-0.055, -0.04], [gJawB, jawAttB]), pair: "jaw" }
+    ];
+  }
+
+  function energyPoints() {
+    const tip = transformPoint(electrode.world, [0, 0, 0.2]);
+    return [[0.0, -0.18, -0.55], [0.0, -0.09, 0.45], [0.0, -0.09, 11.55], tip];
+  }
+
+  function couplingSegs() {
+    const hub = [0, 0.02, -0.35];
+    const segs = [];
+    diskPos.forEach(function (p) {
+      const a = [p[0], p[1], -1.55];
+      const d = dist(a, hub);
+      const dir = vscale(vsub(hub, a), 1 / (d || 1));
+      let t = 0;
+      while (t < d - 0.02) {
+        const t2 = Math.min(d, t + 0.1);
+        segs.push([vadd(a, vscale(dir, t)), vadd(a, vscale(dir, t2))]);
+        t = t2 + 0.07;
+      }
+    });
+    segs.push([[0, 0.02, -0.35], [0, 0, 0.2]]);
+    return segs;
+  }
+
+  const unitN = new Float32Array([1, 0, 0, 0, 1, 0, 0, 0, 1]);
+
+  function fitCamera(cam, aspect) {
+    if (aspect >= 1.15) return cam;
+    const pull = aspect < 0.75 ? 2.45 : 1.28;
+    const widen = aspect < 0.75 ? 16 : 5;
+    return {
+      eye: [
+        cam.target[0] + (cam.eye[0] - cam.target[0]) * pull,
+        cam.target[1] + (cam.eye[1] - cam.target[1]) * pull,
+        cam.target[2] + (cam.eye[2] - cam.target[2]) * pull
+      ],
+      target: cam.target,
+      fov: Math.min(50, cam.fov + widen)
+    };
+  }
+
+  function render(frame) {
+    frame = clamp(frame | 0, 0, LAST);
+    resize();
+    const st = pose(frame);
+    const aspect = canvas.width / canvas.height;
+    const cam = fitCamera(sampleKeys(frame), aspect);
+    lookAt(cam.eye, cam.target, [0, 1, 0], viewM);
+    perspective(cam.fov, aspect, 0.08, 90, projM);
+    mul(projM, viewM, vp);
+    const fog = clamp((vlen(vsub(cam.eye, cam.target)) - 5) / 18, 0.08, 0.8);
+    gl.uniform1f(U.fog, fog);
+    gl.uniform3fv(U.cam, cam.eye);
+    gl.clearColor(BG[0], BG[1], BG[2], 1);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.CULL_FACE);
+
+    const shaftPlane = [1, 0, 0, -lerp(-1.6, 0.0, st.shaftS)];
+    const wristPlane = [1, 0, 0, -lerp(-1.6, 0.02, st.wristS)];
+    const housePlane = [1, 0, 0, -lerp(-2.2, 0.02, st.houseS)];
+    function clipOf(node) {
+      if (node.clip === 1 && st.shaftS > 0.01) return { on: 1, p: shaftPlane };
+      if (node.clip === 2 && st.wristS > 0.01) return { on: 1, p: wristPlane };
+      if (node.clip === 3 && st.houseS > 0.01) return { on: 1, p: housePlane };
+      return { on: 0, p: shaftPlane };
+    }
+
+    opaque.length = 0;
+    blended.length = 0;
+    collect(root);
+    gl.depthMask(true);
+    gl.disable(gl.BLEND);
+    drawMesh(MESH.grid, IDENT, unitN, [0.075, 0.09, 0.12], 1, 1, 0, shaftPlane);
+    opaque.forEach(function (n) {
+      const c = clipOf(n);
+      drawMesh(n.mesh, n.world, n.nmat, n.color, n.alpha, n.mode, c.on, c.p);
+    });
+
+    const tendonA = (frame < 140) ? 0 : (frame < 360 ? Math.max(st.shaftS, st.wristS) : (frame < 690 ? 0.45 : Math.max(0.28, st.shaftS)));
+    const rs = routes();
+    const prev = routesAt(frame - 6);
+    let slot = 0;
+    const draws = [];
+    rs.forEach(function (r, idx) {
+      const now = polyLen(r.pts);
+      const before = polyLen(prev[idx].pts);
+      const loaded = frame >= 300 && frame <= 509 && now < before - 0.002;
+      const baseA = tendonA * (r.pair === "pitch" && st.trace >= 0 ? 0.95 : 0.72);
+      if (st.trace >= 0 && r.pair === "pitch") {
+        draws.push({ pts: subPoly(r.pts, 0, st.trace), radius: 0.02, color: PATH, alpha: 0.95, mode: 1 });
+        draws.push({ pts: subPoly(r.pts, st.trace, 1), radius: 0.016, color: PATH, alpha: 0.28, mode: 1 });
+        const bead0 = clamp(st.trace - 0.035, 0, 1);
+        draws.push({ pts: subPoly(r.pts, bead0, st.trace), radius: 0.032, color: PATH, alpha: 1, mode: 1 });
+      } else {
+        draws.push({ pts: r.pts, radius: loaded ? 0.026 : 0.018, color: loaded ? GOLD : PATH, alpha: baseA, mode: 1 });
+      }
+    });
+    if (st.houseS > 0.2) {
+      couplingSegs().forEach(function (seg) {
+        draws.push({ pts: seg, radius: 0.012, color: GOLD, alpha: st.houseS * 0.85, mode: 1 });
+      });
+    }
+    if (st.energy > 0.02) {
+      const ep = energyPoints();
+      draws.push({ pts: subPoly(ep, 0, st.energy), radius: 0.045, color: INSUL_C, alpha: 0.35 * Math.min(1, st.energy * 1.4), mode: 1 });
+      draws.push({ pts: subPoly(ep, 0, st.energy), radius: 0.02, color: GOLD, alpha: 0.95, mode: 1 });
+    }
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+    gl.depthMask(false);
+    blended.sort(function (a, b) { return a.mode - b.mode; });
+    blended.forEach(function (n) {
+      const c = clipOf(n);
+      drawMesh(n.mesh, n.world, n.nmat, n.color, n.alpha, n.mode, c.on, c.p);
+    });
+    draws.forEach(function (d) {
+      if (slot >= dyn.length) return;
+      const sl = dyn[slot++];
+      tubeInto(sl, d.pts, d.radius);
+      drawMesh(sl, IDENT, unitN, d.color, d.alpha, d.mode, 0, shaftPlane);
+    });
+    gl.depthMask(true);
+    gl.disable(gl.BLEND);
+    updateHud(frame, st, cam);
+  }
+
+  function routesAt(frame) {
+    const saved = {
+      p: pitch.angle, y: yaw.angle, u: upper.angle, l: lower.angle
+    };
+    const f = clamp(frame, 0, LAST);
+    pitch.angle = pitchDeg(f) * Math.PI / 180;
+    yaw.angle = yawDeg(f) * Math.PI / 180;
+    upper.angle = -jawDeg(f) * Math.PI / 180;
+    lower.angle = jawDeg(f) * Math.PI / 180;
+    updateTree(root, null);
+    const r = routes();
+    pitch.angle = saved.p; yaw.angle = saved.y; upper.angle = saved.u; lower.angle = saved.l;
+    updateTree(root, null);
+    armLinks.forEach(function (L) {
+      linkMatrix(L.a, L.b, L.r, L.node.world);
+      normalFromMat4(L.node.world, L.node.nmat);
+    });
+    return r;
+  }
+
+  const labelDefs = [
+    { title: "Proximal housing", sub: "Drive interface", kind: "steel", f0: 0, f1: 165, anchor: function () { return [0.78, 0.62, -0.35]; }, dx: 14, dy: -22 },
+    { title: "Actuation inputs", sub: "Four drives, assignment is explanatory", kind: "act", f0: 24, f1: 160, anchor: function () { return [0.62, -0.05, -1.72]; }, dx: 12, dy: 18 },
+    { title: "Shaft", sub: "Rigid tube to the wrist", kind: "steel", f0: 70, f1: 200, anchor: function () { return [0, 0.28, 4.2]; }, dx: 16, dy: -28 },
+    { title: "Longitudinal section", sub: "Near wall removed", kind: "steel", f0: 180, f1: 340, anchor: function () { return [0, 0.22, 6.4]; }, dx: 18, dy: -32 },
+    { title: "Tendon route", sub: "Schematic. Not to scale.", kind: "path", f0: 190, f1: 360, anchor: function () { return [0.07, 0.12, 7.2]; }, dx: 16, dy: 22 },
+    { title: "Pitch pair", sub: "Traced proximal to distal", kind: "path", f0: 200, f1: 330, anchor: function () { return [-0.07, -0.1, 8.5]; }, dx: -150, dy: 26 },
+    { title: "Wrist pitch", sub: "First distal joint", kind: "path", f0: 320, f1: 470, anchor: function () { return [pitch.world[12], pitch.world[13] + 0.32, pitch.world[14]]; }, dx: -150, dy: -28 },
+    { title: "Wrist yaw", sub: "Second distal joint", kind: "path", f0: 360, f1: 500, anchor: function () { return [yaw.world[12] + 0.05, yaw.world[13] - 0.22, yaw.world[14]]; }, dx: 16, dy: 18 },
+    { title: "Jaws", sub: "Generic grasper", kind: "steel", f0: 430, f1: 560, anchor: function () { return transformPoint(upper.world, [0, 0.04, 0.62]); }, dx: 14, dy: -26 },
+    { title: "Proximal sensing", sub: "Not at the tip", kind: "sense", f0: 650, f1: 820, anchor: function () { return [-0.36, 0.55, -1.9]; }, dx: -160, dy: -24 },
+    { title: "Inferred joint state", sub: "From drive motion", kind: "sense", f0: 675, f1: 830, anchor: function () { return [0.5, -0.15, -1.2]; }, dx: 16, dy: 18 },
+    { title: "Schematic coupling", sub: "Internal gearing not shown", kind: "act", f0: 690, f1: 800, anchor: function () { return [0, 0.35, -0.4]; }, dx: -150, dy: -30 },
+    { title: "Optional energy path", sub: "Separate from tendons", kind: "act", f0: 720, f1: 900, anchor: function () { return [0, -0.2, 6.5]; }, dx: 16, dy: 20 },
+    { title: "Insulation", sub: "Schematic sleeve", kind: "act", f0: 745, f1: 880, anchor: function () { return [0, -0.22, 9.2]; }, dx: -140, dy: 24 },
+    { title: "Optional electrode", sub: "Not a use instruction", kind: "act", f0: 760, f1: 900, anchor: function () { return transformPoint(electrode.world, [0, 0.05, 0]); }, dx: 12, dy: -20 },
+    { title: "Instrument mount", sub: "Connection to the arm", kind: "steel", f0: 800, f1: 980, anchor: function () { return [0, 0.45, -2.3]; }, dx: -150, dy: -18 },
+    { title: "Generic arm", sub: "Joint layout is illustrative", kind: "steel", f0: 880, f1: 1019, anchor: function () { return [0.1, 2.5, -5.2]; }, dx: 16, dy: -20 },
+    { title: "Cannula", sub: "Access tube around the shaft", kind: "steel", f0: 830, f1: 1019, anchor: function () { return [0.15, 0.4, 8.5]; }, dx: 14, dy: -22 },
+    { title: "Remote center", sub: "Kinematic diagram, not a linkage", kind: "sense", f0: 900, f1: 1019, anchor: function () { return [0, 1.15, 8.55]; }, dx: 12, dy: -16 }
+  ];
+
+  const labelEls = labelDefs.map(function (d) {
+    const el = document.createElement("div");
+    el.className = "tag " + d.kind;
+    const b = document.createElement("b");
+    b.textContent = d.title;
+    const s = document.createElement("span");
+    s.textContent = d.sub;
+    el.appendChild(b);
+    if (d.sub) el.appendChild(s);
+    el.hidden = true;
+    document.getElementById("labels").appendChild(el);
+    return el;
+  });
+  const leaderSvg = document.getElementById("leaders");
+
+  function project(world, cam) {
+    const x = vp[0] * world[0] + vp[4] * world[1] + vp[8] * world[2] + vp[12];
+    const y = vp[1] * world[0] + vp[5] * world[1] + vp[9] * world[2] + vp[13];
+    const w = vp[3] * world[0] + vp[7] * world[1] + vp[11] * world[2] + vp[15];
+    if (w <= 0.05) return null;
+    const nx = x / w, ny = y / w;
+    if (nx < -1.15 || nx > 1.15 || ny < -1.15 || ny > 1.15) return null;
+    return [(nx * 0.5 + 0.5) * canvas.clientWidth, (1 - (ny * 0.5 + 0.5)) * canvas.clientHeight];
+  }
+
+  function chipsFor(f) {
+    const chips = [];
+    if (f >= 150 && f < 300) chips.push("SCALE CHANGE · shaft interior enlarged · not to scale");
+    if (f >= 300 && f < 530) chips.push("SCALE CHANGE · distal wrist");
+    if (f >= 300 && f < 510) chips.push("SLOW MOTION · illustrative rate, not a procedure speed");
+    if (f >= 168 && f < 320) chips.push("TIME COMPRESSION · path trace is faster than actuation");
+    if (f >= 750 && f < 980) chips.push("SCALE CHANGE · full manipulator");
+    if (f >= 750 && f < 980) chips.push("TIME COMPRESSION · arm reveal, not a startup sequence");
+    if (f >= 980) chips.push("HOLD · complete system");
+    return chips;
+  }
+
+  function stageAt(f) {
+    let s = STAGES[0];
+    for (let i = 0; i < STAGES.length; i++) if (f >= STAGES[i].f) s = STAGES[i];
+    return s;
+  }
+  function captionAt(f) {
+    for (let i = 0; i < CAPTIONS.length; i++) {
+      if (f >= CAPTIONS[i].f0 && f <= CAPTIONS[i].f1) return CAPTIONS[i].t;
+    }
+    return "";
+  }
+  function timecode(frame) {
+    const s = frame / FPS;
+    return "0:" + s.toFixed(2).padStart(5, "0");
+  }
+
+  const chipBox = document.getElementById("chips");
+  const captionEl = document.getElementById("caption");
+  const pairSvg = document.getElementById("pair");
+
+  function drawSchematic(st) {
+    const show = st.frame >= 175 && st.frame <= 530;
+    const card = document.getElementById("schematic");
+    card.hidden = !show;
+    if (!show) return;
+    const shortenA = st.frame >= 300 && st.frame <= 509 && pitchDeg(st.frame) < pitchDeg(st.frame - 4);
+    const shortenB = st.frame >= 300 && st.frame <= 509 && pitchDeg(st.frame) > pitchDeg(st.frame - 4);
+    const cA = shortenA ? "#FFD166" : "#00E5FF";
+    const cB = shortenB ? "#FFD166" : "#00E5FF";
+    pairSvg.replaceChildren();
+    const ns = "http://www.w3.org/2000/svg";
+    function el(name, attrs) {
+      const n = document.createElementNS(ns, name);
+      Object.keys(attrs).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+      return n;
+    }
+    pairSvg.appendChild(el("circle", { cx: 78, cy: 60, r: 28, fill: "none", stroke: "#8EA0B8", "stroke-width": 6 }));
+    pairSvg.appendChild(el("circle", { cx: 78, cy: 60, r: 6, fill: "#344257" }));
+    pairSvg.appendChild(el("path", { d: "M78 32 C 78 18, 40 16, 18 28", fill: "none", stroke: cA, "stroke-width": 3 }));
+    pairSvg.appendChild(el("path", { d: "M78 88 C 78 102, 40 104, 18 92", fill: "none", stroke: cB, "stroke-width": 3 }));
+    pairSvg.appendChild(el("text", { x: 96, y: 36, fill: "#93A0B5", "font-size": 11 })).textContent = "pulley";
+    pairSvg.appendChild(el("text", { x: 8, y: 22, fill: cA, "font-size": 11 })).textContent = shortenA ? "short side" : "side A";
+    pairSvg.appendChild(el("text", { x: 8, y: 112, fill: cB, "font-size": 11 })).textContent = shortenB ? "short side" : "side B";
+  }
+
+  function updateHud(frame, st, cam) {
+    document.getElementById("stage-name").textContent = stageAt(frame).name;
+    document.getElementById("frame-read").textContent = "f " + String(frame).padStart(4, "0");
+    document.getElementById("time-read").textContent = timecode(frame) + " / 0:34.00";
+    const scrub = document.getElementById("scrub");
+    if (document.activeElement !== scrub) scrub.value = String(frame);
+    scrub.setAttribute("aria-valuetext", "frame " + frame + ", " + stageAt(frame).name);
+    captionEl.textContent = captionAt(frame);
+    chipBox.replaceChildren();
+    chipsFor(frame).forEach(function (t) {
+      const s = document.createElement("span");
+      s.className = "chip";
+      s.textContent = t;
+      chipBox.appendChild(s);
+    });
+    document.querySelectorAll(".ticks button").forEach(function (b) {
+      const f0 = Number(b.dataset.f);
+      const next = STAGES.find(function (s) { return s.f > f0; });
+      const f1 = next ? next.f : 1020;
+      b.setAttribute("aria-current", frame >= f0 && frame < f1 ? "true" : "false");
+    });
+    const ang = document.getElementById("angles");
+    const showAng = frame >= 300 && frame <= 860;
+    ang.hidden = !showAng;
+    if (showAng) {
+      document.getElementById("ang-p").textContent = (st.pitch >= 0 ? "+" : "") + st.pitch.toFixed(1) + "°";
+      document.getElementById("ang-y").textContent = (st.yaw >= 0 ? "+" : "") + st.yaw.toFixed(1) + "°";
+      document.getElementById("ang-j").textContent = st.jaw.toFixed(1) + "°";
+    }
+    drawSchematic(st);
+    const playBtn = document.getElementById("play");
+    playBtn.textContent = frame >= LAST && !playing ? "Replay" : (playing ? "Pause" : "Play");
+
+    leaderSvg.replaceChildren();
+    const placed = [];
+    const ns = "http://www.w3.org/2000/svg";
+    labelDefs.forEach(function (d, i) {
+      const el = labelEls[i];
+      const fadeIn = clamp((frame - d.f0) / 10, 0, 1);
+      const fadeOut = clamp((d.f1 - frame) / 10, 0, 1);
+      const fade = Math.min(fadeIn, fadeOut);
+      if (fade <= 0) { el.hidden = true; return; }
+      const p = project(d.anchor());
+      if (!p) { el.hidden = true; return; }
+      let x = p[0] + d.dx;
+      let y = p[1] + d.dy;
+      const topLim = window.innerWidth < 800 ? 78 : 118;
+      const botLim = window.innerHeight - 236;
+      x = clamp(x, 8, window.innerWidth - 180);
+      y = clamp(y, topLim, botLim);
+      for (let k = 0; k < placed.length; k++) {
+        if (Math.abs(placed[k].x - x) < 140 && Math.abs(placed[k].y - y) < 36) y = clamp(y + 38, topLim, botLim);
+      }
+      placed.push({ x: x, y: y });
+      el.hidden = false;
+      el.style.opacity = String(fade);
+      el.style.left = x + "px";
+      el.style.top = y + "px";
+      const line = document.createElementNS(ns, "line");
+      const color = d.kind === "path" ? "#00E5FF" : d.kind === "act" ? "#FFD166" : d.kind === "sense" ? "#9D4EDD" : "#C5D0DE";
+      line.setAttribute("x1", p[0].toFixed(1));
+      line.setAttribute("y1", p[1].toFixed(1));
+      line.setAttribute("x2", (x + (d.dx < 0 ? 150 : 0)).toFixed(1));
+      line.setAttribute("y2", y.toFixed(1));
+      line.setAttribute("stroke", color);
+      line.setAttribute("stroke-width", "1");
+      line.setAttribute("opacity", String(0.75 * fade));
+      leaderSvg.appendChild(line);
+      const dot = document.createElementNS(ns, "circle");
+      dot.setAttribute("cx", p[0].toFixed(1));
+      dot.setAttribute("cy", p[1].toFixed(1));
+      dot.setAttribute("r", "2.5");
+      dot.setAttribute("fill", color);
+      dot.setAttribute("opacity", String(fade));
+      leaderSvg.appendChild(dot);
+    });
+    if (params.get("debug") === "1") {
+      document.getElementById("boot").textContent = "eye " + cam.eye.map(function (n) { return n.toFixed(2); }).join(", ");
+    }
+  }
+
+  const transcript = document.getElementById("transcript");
+  CAPTIONS.forEach(function (c) {
+    const li = document.createElement("li");
+    li.textContent = c.t;
+    transcript.appendChild(li);
+  });
+
+  const ticks = document.getElementById("ticks");
+  STAGES.forEach(function (s) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.dataset.f = String(s.f);
+    b.style.left = (s.f / LAST * 100) + "%";
+    b.title = s.name;
+    b.setAttribute("aria-label", s.name + ", frame " + s.f);
+    b.addEventListener("click", function () { go(s.f, false); });
+    ticks.appendChild(b);
+  });
+
+  let frame = 0;
+  let playing = !reduce;
+  let acc = 0;
+  let lastT = 0;
+  if (params.has("frame")) {
+    frame = clamp(parseInt(params.get("frame"), 10) || 0, 0, LAST);
+    playing = params.get("play") === "1";
+  }
+  if (reduce) {
+    document.getElementById("rm").hidden = false;
+    playing = false;
+  }
+
+  function go(f, keepPlaying) {
+    frame = clamp(f, 0, LAST);
+    acc = 0;
+    if (!keepPlaying) playing = false;
+    render(frame);
+  }
+  document.getElementById("play").addEventListener("click", function () {
+    if (frame >= LAST) { frame = 0; playing = true; return; }
+    playing = !playing;
+  });
+  document.getElementById("scrub").addEventListener("input", function (e) {
+    go(Number(e.target.value), false);
+  });
+  document.getElementById("notes-btn").addEventListener("click", function () {
+    const panel = document.getElementById("about");
+    const open = panel.hidden;
+    panel.hidden = !open;
+    this.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+  window.addEventListener("keydown", function (e) {
+    if (e.target && e.target.matches && e.target.matches("input, textarea, summary")) return;
+    if (e.code === "Space") {
+      e.preventDefault();
+      if (frame >= LAST) frame = 0;
+      playing = !playing;
+    } else if (e.code === "ArrowRight") {
+      e.preventDefault();
+      go(frame + (e.shiftKey ? 30 : 1), false);
+    } else if (e.code === "ArrowLeft") {
+      e.preventDefault();
+      go(frame - (e.shiftKey ? 30 : 1), false);
+    } else if (e.code === "Home") {
+      go(0, false);
+    } else if (e.code === "End") {
+      go(LAST, false);
+    }
+  });
+  window.addEventListener("resize", function () { render(frame); });
+
+  function selfCheck() {
+    const m = new Float32Array(16);
+    axisMatrix("x", Math.PI / 2, [0, 0, 0], [1, 1, 1], m);
+    const p = transformPoint(m, [0, 1, 0]);
+    const p2 = transformPoint(m, [0, 0, 1]);
+    const errs = [];
+    if (Math.abs(p[2] - 1) > 1e-4) errs.push("rx");
+    if (Math.abs(p2[1] + 1) > 1e-4) errs.push("rxz");
+    const V = new Float32Array(16), P = new Float32Array(16), M = new Float32Array(16);
+    lookAt([-8, 2, 1], [0, 0, 4], [0, 1, 0], V);
+    perspective(40, 16 / 9, 0.1, 80, P);
+    mul(P, V, M);
+    const clip = [
+      M[0] * 0 + M[4] * 0 + M[8] * 4 + M[12],
+      M[1] * 0 + M[5] * 0 + M[9] * 4 + M[13],
+      M[3] * 0 + M[7] * 0 + M[11] * 4 + M[15]
+    ];
+    if (Math.abs(clip[0] / clip[2]) > 0.02 || Math.abs(clip[1] / clip[2]) > 0.02) errs.push("look");
+    if (Math.abs(pitchDeg(509) - 16) > 0.01) errs.push("pitch");
+    if (Math.abs(yawDeg(509) - 20) > 0.01) errs.push("yaw");
+    if (Math.abs(jawDeg(0) - 3) > 0.01 || Math.abs(jawDeg(1019) - 18) > 0.01) errs.push("jaw");
+    const endKey = CAM_KEYS[CAM_KEYS.length - 1];
+    const holdKey = CAM_KEYS[CAM_KEYS.length - 2];
+    if (Math.abs(endKey.eye[0] - holdKey.eye[0]) > 1e-6 || Math.abs(endKey.eye[2] - holdKey.eye[2]) > 1e-6) errs.push("holdkeys");
+    const end = sampleKeys(LAST);
+    if (Math.abs(end.eye[0] - endKey.eye[0]) > 1e-3 || Math.abs(end.fov - endKey.fov) > 1e-3) errs.push("endcam");
+    if (Math.abs(sampleKeys(0).fov - CAM_KEYS[0].fov) > 1e-6) errs.push("cam0");
+    return errs.length ? errs.join(" ") : "";
+  }
+
+  const check = selfCheck();
+  if (check) document.getElementById("boot").textContent = "Self-check: " + check;
+
+  window.__instrument = {
+    frames: 1020,
+    fps: 30,
+    last: LAST,
+    render: render,
+    pose: pose,
+    sampleKeys: sampleKeys,
+    pitchDeg: pitchDeg,
+    yawDeg: yawDeg,
+    jawDeg: jawDeg
+  };
+
+  render(frame);
+  function loop(t) {
+    if (!lastT) lastT = t;
+    let dt = t - lastT;
+    lastT = t;
+    if (dt > 100) dt = 100;
+    if (dt < 0) dt = 0;
+    if (playing) {
+      acc += dt;
+      const step = 1000 / FPS;
+      while (acc >= step && frame < LAST) {
+        frame += 1;
+        acc -= step;
+      }
+      if (frame >= LAST) { playing = false; acc = 0; }
+    }
+    render(frame);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
